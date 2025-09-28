@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Dashboard</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        /* ========================
+           মূল ড্যাশবোর্ডের CSS
+           ======================== */
+        :root {
+            --primary-color: #2980b9;
+            --secondary-color: #2c3e50;
+            --background-color: #ecf0f1;
+            --card-bg-color: #ffffff;
+            --text-color: #34495e;
+            --light-text-color: #7f8c8d;
+            --border-color: #e3e6f0;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Noto Sans Bengali', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            background-color: var(--secondary-color);
+            color: white;
+            height: 100vh;
+            padding: 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .profile { text-align: center; margin-bottom: 30px; }
+        .profile img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary-color); margin-bottom: 10px; }
+        .nav-menu ul { list-style-type: none; }
+        .nav-menu ul li a { color: white; text-decoration: none; display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 15px 10px; border-radius: 8px; margin-bottom: 5px; transition: background-color 0.3s ease; }
+        .nav-menu ul li a .link-text { display: flex; align-items: center; gap: 15px; }
+        .nav-menu ul li a .icon { width: 20px; text-align: center; }
+        .nav-menu ul li a:hover, .nav-menu ul li.active > a { background-color: var(--primary-color); }
+        .submenu { list-style: none; padding-left: 35px; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
+        .nav-menu li.open > .submenu { max-height: 500px; margin-top: 5px; }
+        .submenu li a { font-size: 0.9em; padding: 10px; background-color: rgba(0,0,0,0.2); }
+        .nav-menu .arrow .fas { transition: transform 0.3s ease-out; }
+        .nav-menu li.open > a .arrow .fas { transform: rotate(-180deg); }
+
+        /* Main Content Styles */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            margin-left: 260px;
+            transition: margin-left 0.3s ease-in-out;
+        }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header-title-group { display: flex; align-items: center; gap: 15px; }
+        .header-title-group a { display: flex; align-items: center; text-decoration: none; color: inherit; }
+        .header-logo { height: 45px; width: auto; }
+        .header h1 { font-size: 1.8em; font-weight: 700; color: var(--text-color); margin-left: 15px; }
+        .hamburger { display: none; font-size: 24px; cursor: pointer; z-index: 1001; color: var(--secondary-color); }
+
+        /* Responsive Styles for Mobile */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.show { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .hamburger { display: block; }
+            .header h1 { font-size: 1.2em; }
+            .header-logo { height: 35px; }
+        }
+
+        /* ========================
+           নতুন পেজের এবং নোটিশের জন্য CSS
+           ======================== */
+        .news-scroll {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+
+        .main-header h1 {
+            font-size: 2rem;
+            margin: 0 0 5px 0;
+            font-weight: 700;
+        }
+        
+        .main-header p {
+            font-size: 1.1rem;
+            color: var(--light-text-color);
+            margin-bottom: 30px;
+        }
+
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .subject-card {
+            background-color: var(--card-bg-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 25px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .subject-card h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.25rem;
+        }
+
+        .action-button {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            padding: 12px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .action-button:hover {
+            background-color: #2471a3; /* Darker shade of primary color */
+        }
+        
+        @media (max-width: 600px) {
+            .main-header h1 { font-size: 1.5rem; }
+            .main-header p { font-size: 0.9rem; }
+            .subject-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="dashboard-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="profile">
+                <img src="https://cdn-icons-png.flaticon.com/512/9815/9815472.png" alt="Profile Picture">
+                <h3>Student x63</h3>
+                <p>Student</p>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="https://academyh.github.io/dashboard"><span class="link-text"><span class="icon"><i class="fas fa-tachometer-alt"></i></span> ড্যাশবোর্ড</span></a></li>
+                    
+                    <li class="has-submenu active open">
+                        <a href="#">
+                            <span class="link-text"><span class="icon"><i class="fas fa-book"></i></span> আমার কোর্সসমূহ</span>
+                            <span class="arrow"><i class="fas fa-chevron-down"></i></span>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="https://academyh.github.io/HSC26-27">HSC26-27</a></li>
+                            <li class="active"><a href="https://academyh.github.io/ict">ICT Course</a></li> 
+                        </ul>
+                    </li>
+
+                    <li><a href="https://academyh.github.io/buy-more-courses"><span class="link-text"><span class="icon"><i class="fas fa-shopping-cart"></i></span> আরও কোর্স কিনুন</span></a></li>
+                    <li><a href="https://academyh.github.io/calendar"><span class="link-text"><span class="icon"><i class="fas fa-calendar-alt"></i></span> ক্যালেন্ডার</span></a></li>
+                    <li><a href="https://academyh.github.io/orders"><span class="link-text"><span class="icon"><i class="fas fa-file-invoice"></i></span> অর্ডারসমূহ</span></a></li>
+                    <li><a href="https://academyh.github.io/doubt-solve"><span class="link-text"><span class="icon"><i class="fas fa-question-circle"></i></span> ডাউট সলভ</span></a></li>
+                    <li><a href="https://academyh.github.io/logout"><span class="link-text"><span class="icon"><i class="fas fa-sign-out-alt"></i></span> লগ আউট</span></a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                 <div class="header-title-group">
+                    <a href="https://academyh.github.io/hsc/">
+                        <img src="https://i.ibb.co/5hyxv7PZ/20250928-185506.png" alt="Company Logo" class="header-logo">
+                        <h1 id="greeting">শুভ রাত্রি, Student x63</h1>
+                    </a>
+                 </div>
+                 <div class="hamburger" id="hamburger-icon">
+                    <i class="fas fa-bars"></i>
+                 </div>
+            </header>
+            
+            <div class="news-scroll">
+                <marquee behavior="scroll" direction="left">সাইটের কাজ চলমান, শীগ্রই নতুন নতুন আপডেট দেওয়া হবে।</marquee>
+            </div>
+
+            <header class="main-header">
+                <h1>এক নজরে কোর্সের বিষয়বস্তু</h1>
+                <p>EBI 3.0 | English, Bangla and ICT | HSC 2026/27</p>
+            </header>
+
+            <section class="subject-grid">
+                
+                <div class="subject-card">
+                    <div class="card-icon">💻</div>
+                    <h3>ICT</h3>
+                    <a href="https://academyh.github.io/ict" class="action-button">কোর্স শুরু করুন</a>
+                </div>
+
+                <div class="subject-card">
+                    <div class="card-icon">📖</div>
+                    <h3>English 1st Paper</h3>
+                    <a href="https://academyh.github.io/English1st" class="action-button">কোর্স শুরু করুন</a>
+                </div>
+
+                <div class="subject-card">
+                    <div class="card-icon">✍️</div>
+                    <h3>English 2nd Paper</h3>
+                    <a href="https://academyh.github.io/English2nd" class="action-button">কোর্স শুরু করুন</a>
+                </div>
+
+                <div class="subject-card">
+                    <div class="card-icon">🇧🇩</div>
+                    <h3>Bangla 1st Paper</h3>
+                    <a href="https://academyh.github.io/Bangla1st" class="action-button">কোর্স শুরু করুন</a>
+                </div>
+                
+                <div class="subject-card">
+                    <div class="card-icon">📝</div>
+                    <h3>Bangla 2nd Paper</h3>
+                    <a href="https://academyh.github.io/Bangla2nd" class="action-button">কোর্স শুরু করুন</a>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // সাইডবার এবং মেনুবারের জন্য জাভাস্ক্রিপ্ট
+            const hamburger = document.getElementById('hamburger-icon');
+            const sidebar = document.getElementById('sidebar');
+            hamburger.addEventListener('click', () => {
+                sidebar.classList.toggle('show');
+            });
+
+            const submenuItems = document.querySelectorAll('.has-submenu > a');
+            submenuItems.forEach(item => {
+                item.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    this.parentElement.classList.toggle('open');
+                });
+            });
+
+            // সময় অনুযায়ী গ্রিটিং পরিবর্তনের জন্য জাভাস্ক্রিপ্ট
+            const greetingElement = document.getElementById('greeting');
+            const currentHour = new Date().getHours();
+            let greetingText = (currentHour < 12) ? 'শুভ সকাল' : (currentHour < 17) ? 'শুভ দুপুর' : (currentHour < 20) ? 'শুভ বিকাল' : 'শুভ রাত্রি';
+            // Only update the text, not the entire element, to keep the link working
+            const greetingTextNode = document.createTextNode(`, Student x63`);
+            greetingElement.textContent = `${greetingText}, Student x63`;
+        });
+    </script>
+</body>
+    </html>
+    
